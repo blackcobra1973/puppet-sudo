@@ -1,4 +1,4 @@
-#class sudo::params 
+#class sudo::params
 #Set the paramters for the sudo module
 class sudo::params {
   $source_base = "puppet:///modules/${module_name}/"
@@ -99,7 +99,8 @@ class sudo::params {
       }
     }
     freebsd: {
-      $package = 'security/sudo'
+      #$package = 'security/sudo'
+      $package = undef
       $package_ensure = 'present'
       $package_source = ''
       $package_admin_file = ''

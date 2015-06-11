@@ -112,25 +112,69 @@ class sudo(
     package_admin_file => $package_admin_file,
   }
 
-  file { $config_file:
-    ensure  => $file_ensure,
-    owner   => 'root',
-    group   => $sudo::params::config_file_group,
-    mode    => '0440',
-    replace => $config_file_replace,
-    source  => $source,
-    require => Package[$package],
-  }
+  case $::osfamily {
+    freebsd: {
+      file { $config_file:
+        ensure  => $file_ensure,
+        owner   => 'root',
+        group   => $sudo::params::config_file_group,
+        mode    => '0440',
+        replace => $config_file_replace,
+        source  => $source,
+      }
 
-  file { $config_dir:
-    ensure  => $dir_ensure,
-    owner   => 'root',
-    group   => $sudo::params::config_file_group,
-    mode    => '0550',
-    recurse => $purge,
-    purge   => $purge,
-    ignore  => $purge_ignore,
-    require => Package[$package],
+      file { $config_dir:
+        ensure  => $dir_ensure,
+        owner   => 'root',
+        group   => $sudo::params::config_file_group,
+        mode    => '0550',
+        recurse => $purge,
+        purge   => $purge,
+        ignore  => $purge_ignore,
+      }
+    }
+    openbsd: {
+      file { $config_file:
+        ensure  => $file_ensure,
+        owner   => 'root',
+        group   => $sudo::params::config_file_group,
+        mode    => '0440',
+        replace => $config_file_replace,
+        source  => $source,
+      }
+
+      file { $config_dir:
+        ensure  => $dir_ensure,
+        owner   => 'root',
+        group   => $sudo::params::config_file_group,
+        mode    => '0550',
+        recurse => $purge,
+        purge   => $purge,
+        ignore  => $purge_ignore,
+      }
+    }
+    default: {
+      file { $config_file:
+        ensure  => $file_ensure,
+        owner   => 'root',
+        group   => $sudo::params::config_file_group,
+        mode    => '0440',
+        replace => $config_file_replace,
+        source  => $source,
+        require => Package[$package],
+      }
+
+      file { $config_dir:
+        ensure  => $dir_ensure,
+        owner   => 'root',
+        group   => $sudo::params::config_file_group,
+        mode    => '0550',
+        recurse => $purge,
+        purge   => $purge,
+        ignore  => $purge_ignore,
+        require => Package[$package],
+      }
+    }
   }
 
   if $config_file_replace == false and $::osfamily == 'RedHat' and $::operatingsystemmajrelease == '5' {

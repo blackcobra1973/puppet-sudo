@@ -44,6 +44,7 @@ class sudo::package(
         package_ensure => $package_ensure,
       }
     }
+    freebsd: {}
     openbsd: {}
     solaris: {
       class { 'sudo::package::solaris':
