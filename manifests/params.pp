@@ -10,14 +10,17 @@ class sudo::params {
           $source = "${source_base}sudoers.ubuntu"
         }
         default: {
-          if (0 + $::operatingsystemmajrelease >= 7) {
+          if (versioncmp($::operatingsystemmajrelease, '7') >= 0) or
+            ($::operatingsystemmajrelease =~ /\/sid/) or
+            ($::operatingsystemmajrelease =~ /Kali/) {
             $source = "${source_base}sudoers.debian"
           } else {
             $source = "${source_base}sudoers.olddebian"
           }
         }
       }
-      $package           = 'sudo'
+      $package = 'sudo'
+      $package_ldap = 'sudo-ldap'
       $package_ensure    = 'present'
       $package_source    = ''
       $package_admin_file = ''
@@ -27,6 +30,8 @@ class sudo::params {
     }
     redhat: {
       $package = 'sudo'
+      # in redhat sudo package is already compiled for ldap support
+      $package_ldap = $package
 
       # rhel 5.0 to 5.4 use sudo 1.6.9 which does not support
       # includedir, so we have to make sure sudo 1.7 (comes with rhel
@@ -61,6 +66,7 @@ class sudo::params {
       case $::operatingsystem {
         'OmniOS': {
           $package = 'sudo'
+          $package_ldap = undef
           $package_ensure = 'present'
           $package_source = ''
           $package_admin_file = ''
@@ -69,10 +75,22 @@ class sudo::params {
           $source = "${source_base}sudoers.omnios"
           $config_file_group = 'root'
         }
+        'SmartOS': {
+          $package = 'sudo'
+          $package_ldap = undef
+          $package_ensure = 'present'
+          $package_source = ''
+          $package_admin_file = ''
+          $config_file = '/opt/local/etc/sudoers'
+          $config_dir = '/opt/local/etc/sudoers.d/'
+          $source = "${source_base}sudoers.smartos"
+          $config_file_group = 'root'
+        }
         default: {
           case $::kernelrelease {
             '5.11': {
               $package = 'pkg://solaris/security/sudo'
+              $package_ldap = undef
               $package_ensure = 'present'
               $package_source = ''
               $package_admin_file = ''
@@ -83,6 +101,7 @@ class sudo::params {
             }
             '5.10': {
               $package = 'TCMsudo'
+              $package_ldap = undef
               $package_ensure = 'present'
               $package_source = "http://www.sudo.ws/sudo/dist/packages/Solaris/10/TCMsudo-1.8.9p5-${::hardwareisa}.pkg.gz"
               $package_admin_file = '/var/sadm/install/admin/puppet'
@@ -121,6 +140,7 @@ class sudo::params {
     }
     aix: {
       $package = 'sudo'
+      $package_ldap = undef
       $package_ensure = 'present'
       $package_source = 'http://www.sudo.ws/sudo/dist/packages/AIX/5.3/sudo-1.8.9-6.aix53.lam.rpm'
       $package_admin_file = ''
@@ -129,10 +149,21 @@ class sudo::params {
       $source = "${source_base}sudoers.aix"
       $config_file_group = 'system'
     }
+    darwin: {
+      $package = undef
+      $package_ensure = 'present'
+      $package_source = ''
+      $package_admin_file = ''
+      $config_file = '/etc/sudoers'
+      $config_dir = '/etc/sudoers.d/'
+      $source = "${source_base}sudoers.darwin"
+      $config_file_group = 'wheel'
+    }
     default: {
       case $::operatingsystem {
         gentoo: {
           $package = 'sudo'
+          $package_ldap = $package
           $package_ensure = 'present'
           $config_file = '/etc/sudoers'
           $config_dir = '/etc/sudoers.d/'

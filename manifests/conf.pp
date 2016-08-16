@@ -53,7 +53,7 @@ define sudo::conf(
   # if it is not provided. $sudo::params isn't included before
   # the parameters are loaded in.
   $sudo_config_dir_real = $sudo_config_dir ? {
-    undef            => $sudo::params::config_dir,
+    undef            => $sudo::config_dir,
     $sudo_config_dir => $sudo_config_dir
   }
 
@@ -110,7 +110,7 @@ define sudo::conf(
   }
 
   exec {"sudo-syntax-check for file ${cur_file}":
-    command     => "visudo -c -f ${cur_file} || ( rm -f '${cur_file}' && exit 1)",
+    command     => "visudo -c -f '${cur_file}' || ( rm -f '${cur_file}' && exit 1)",
     refreshonly => true,
     path        => [
       '/bin',
@@ -118,7 +118,9 @@ define sudo::conf(
       '/usr/bin',
       '/usr/sbin',
       '/usr/local/bin',
-      '/usr/local/sbin'
+      '/usr/local/sbin',
+      '/opt/local/sbin/',
+      '/opt/local/bin/'
     ],
   }
 }
