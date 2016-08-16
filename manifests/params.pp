@@ -120,6 +120,7 @@ class sudo::params {
     freebsd: {
       #$package = 'security/sudo'
       $package = undef
+      $package_ldap = undef
       $package_ensure = 'present'
       $package_source = ''
       $package_admin_file = ''
@@ -130,6 +131,7 @@ class sudo::params {
     }
     openbsd: {
       $package = undef
+      $package_ldap = undef
       $package_ensure = 'present'
       $package_source = ''
       $package_admin_file = ''
